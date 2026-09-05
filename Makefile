@@ -138,7 +138,10 @@ else ifneq (,$(findstring armv,$(platform)))
    TARGET := $(TARGET_NAME)_libretro.so
    SHARED := -shared -Wl,--no-undefined
    fpic := -fPIC
+# Same as the Windows branch below: do not overwrite a cross compiler.
+ifeq ($(origin CC), default)
    CC = gcc
+endif
 ifneq (,$(findstring cortexa8,$(platform)))
    CFLAGS += -marm -mcpu=cortex-a8
    ASFLAGS += -mcpu=cortex-a8
@@ -164,7 +167,11 @@ else ifeq ($(platform), emscripten)
    TARGET := $(TARGET_NAME)_libretro_emscripten.bc
 else
    TARGET := $(TARGET_NAME)_libretro.dll
+# Only when nobody has said otherwise. A plain assignment beats the CC the
+# environment carries, which is how a cross build names its compiler.
+ifeq ($(origin CC), default)
    CC = gcc
+endif
    SHARED := -shared -static-libgcc -static-libstdc++ -Wl,--version-script=libretro/link.T
    CFLAGS += -D__WIN32__ -D__LIBRETRO__
 	LIBUSB = 1
